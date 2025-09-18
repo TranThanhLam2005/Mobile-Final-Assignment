@@ -94,7 +94,6 @@ dependencies {
 
 
     // WorkManager + App Startup (network monitoring / init)
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation("androidx.startup:startup-runtime:1.1.1")
 
     // Lifecycle components (service, viewmodel, livedata)
