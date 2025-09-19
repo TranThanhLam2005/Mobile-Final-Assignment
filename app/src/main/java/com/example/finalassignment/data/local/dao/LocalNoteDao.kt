@@ -20,4 +20,7 @@ interface NoteDao {
 
     @Query("SELECT * FROM notes WHERE id = :id LIMIT 1")
     suspend fun getNoteById(id: Int): LocalNoteEntity?
+
+    @Query("SELECT * FROM notes WHERE timestamp > :after")
+    suspend fun getNotesAfter(after: Long): List<LocalNoteEntity>
 }

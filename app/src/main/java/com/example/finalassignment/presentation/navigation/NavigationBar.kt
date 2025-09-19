@@ -1,6 +1,8 @@
 package com.example.finalassignment.presentation.navigation
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -38,9 +40,9 @@ enum class Destination(
     val contentDescription: String
 ) {
     HOMES(Screen.HomeScreen.route, "Home", Icons.Outlined.Home, Icons.Filled.Home,"Home"),
-    DETAILNOTE(Screen.NoteDetailScreen.route, "Note", Icons.Outlined.Notes, Icons.Filled.Notes,"Note")
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
@@ -55,16 +57,14 @@ fun AppNavHost(
             composable(destination.route) {
                 when (destination) {
                     Destination.HOMES -> HomeScreen(navController = navController)
-                    Destination.DETAILNOTE -> NoteDetailScreen(navController = navController)
                 }
             }
         }
-//        composable(Screen.ClubScreenDetail.route+"/{clubId}"){
-//                backStackEntry ->
-//            val clubId = backStackEntry.arguments?.getString("clubId") ?: return@composable
-//            ClubScreenDetail(clubId = clubId, navController = navController)
-//        }
-
+        composable(Screen.NoteDetailScreen.route+"/{noteId}"){
+                backStackEntry ->
+            val noteId = backStackEntry.arguments?.getString("noteId") ?: return@composable
+            NoteDetailScreen(noteId = noteId, navController = navController)
+        }
     }
 }
 
