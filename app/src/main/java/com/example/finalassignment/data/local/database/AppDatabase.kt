@@ -4,13 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.finalassignment.data.local.dao.NoteDao
-import com.example.finalassignment.data.local.entity.LocalNoteEntity
+import com.example.finalassignment.data.local.dao.LocalHealthMetricDao
+import com.example.finalassignment.data.local.entity.LocalHealthMetricEntity
 
-@Database(entities = [LocalNoteEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [LocalHealthMetricEntity::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun noteDao(): NoteDao
+    // DAO
+    abstract fun localHealthMetricDao(): LocalHealthMetricDao
 
     companion object {
         @Volatile
@@ -21,7 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "note_db"
+                    "health_metrics_db"
                 ).build()
                 INSTANCE = instance
                 instance

@@ -3,7 +3,7 @@ package com.example.finalassignment
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import androidx.work.*
-import com.example.finalassignment.worker.NoteCheckWorker
+import com.example.finalassignment.worker.MetricCheckWorker
 import java.util.concurrent.TimeUnit
 
 @HiltAndroidApp
@@ -11,28 +11,25 @@ class FinalApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        scheduleNoteCheckWork()
+        scheduleMetricCheckWork()
     }
-
-    private fun scheduleNoteCheckWork() {
+    private fun scheduleMetricCheckWork() {
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-            .setRequiresBatteryNotLow(true)
+            .setRequiredNetworkType(NetworkType.NOT_REQUIRED) // No network needed
+            .setRequiresBatteryNotLow(true)                   // Avoid low-battery runs
             .build()
 
-        val workRequest = PeriodicWorkRequestBuilder<NoteCheckWorker>(
-            repeatInterval = 3, // Check every 3 hours
-            repeatIntervalTimeUnit = TimeUnit.HOURS,
-            flexTimeInterval = 1, // Allow 1 hour flexibility
-            flexTimeIntervalUnit = TimeUnit.HOURS
+        // PeriodicWorkRequestBuilder only takes (interval, TimeUnit)
+        val workRequest = PeriodicWorkRequestBuilder<MetricCheckWorker>(
+            3, TimeUnit.HOURS // Run every 3 Hour
         )
             .setConstraints(constraints)
-            .addTag("note_check_work")
+            .addTag("metric_check_work")
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "note_check_periodic",
-            ExistingPeriodicWorkPolicy.KEEP, // Keep existing work if already scheduled
+            "metric_check_periodic",
+            ExistingPeriodicWorkPolicy.KEEP, // Keep if already scheduled
             workRequest
         )
     }

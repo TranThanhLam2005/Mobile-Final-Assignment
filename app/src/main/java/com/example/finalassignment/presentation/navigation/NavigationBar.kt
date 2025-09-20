@@ -6,10 +6,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.TipsAndUpdates
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notes
+import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
@@ -28,8 +30,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.finalassignment.presentation.screen.healthytip.HealthyTipScreen
+//import com.example.finalassignment.presentation.screen.healthytip.HealthyTipScreen
+import com.example.finalassignment.presentation.screen.history.HistoryScreen
 import com.example.finalassignment.presentation.screen.home.HomeScreen
-import com.example.finalassignment.presentation.screen.note.NoteDetailScreen
+import com.example.finalassignment.presentation.screen.metricdetail.MetricDetailScreen
 
 
 enum class Destination(
@@ -39,7 +44,9 @@ enum class Destination(
     val selectedIcon: ImageVector,
     val contentDescription: String
 ) {
-    HOMES(Screen.HomeScreen.route, "Home", Icons.Outlined.Home, Icons.Filled.Home,"Home"),
+    HOMES(Screen.HomeScreen.route, "Dashboard", Icons.Outlined.Home, Icons.Filled.Home,"Home"),
+    HEALTHYTIPS(Screen.HealthyTipScreen.route, "Healthy Tips", Icons.Outlined.TipsAndUpdates, Icons.Filled.TipsAndUpdates,"Healthy Tips"),
+    HISTORY(Screen.HistoryScreen.route, "History", Icons.Outlined.History, Icons.Filled.History,"History")
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -57,17 +64,20 @@ fun AppNavHost(
             composable(destination.route) {
                 when (destination) {
                     Destination.HOMES -> HomeScreen(navController = navController)
+                    Destination.HEALTHYTIPS -> HealthyTipScreen(navController = navController)
+                    Destination.HISTORY -> HistoryScreen(navController = navController)
                 }
             }
         }
-        composable(Screen.NoteDetailScreen.route+"/{noteId}"){
+        composable(Screen.MetricDetailScreen.route+"/{metricId}"){
                 backStackEntry ->
-            val noteId = backStackEntry.arguments?.getString("noteId") ?: return@composable
-            NoteDetailScreen(noteId = noteId, navController = navController)
+            val metricId = backStackEntry.arguments?.getString("metricId") ?: return@composable
+            MetricDetailScreen(metricId = metricId, navController = navController)
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationBar(modifier: Modifier = Modifier) {
     val navController = rememberNavController()

@@ -1,74 +1,60 @@
 package com.example.finalassignment.presentation.screen.home
 
-import android.content.Context
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.finalassignment.data.local.dao.NoteDao
-import com.example.finalassignment.data.local.entity.LocalNoteEntity
-import com.example.finalassignment.domain.repository.WeatherRepository
+import com.example.finalassignment.data.local.dao.LocalHealthMetricDao
+import com.example.finalassignment.data.local.entity.LocalHealthMetricEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
+
 
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val noteDao: NoteDao,
-    private val weatherRepository: WeatherRepository
+    private val healthMetricDao: LocalHealthMetricDao,
 ) : ViewModel() {
 
-    private val _notes = MutableStateFlow<List<LocalNoteEntity>>(emptyList())
-    val notes: StateFlow<List<LocalNoteEntity>> = _notes.asStateFlow()
+    private val _metricsToday = MutableStateFlow<List<LocalHealthMetricEntity>>(emptyList())
+    val metricsToday: StateFlow<List<LocalHealthMetricEntity>> = _metricsToday
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        getAllNotes()
+        getAllMetricToday()
     }
 
-    private fun getAllNotes() {
+    fun getAllMetricToday(){
+        // Collect Flow from DAO so updates are automatic
         viewModelScope.launch {
-            _isLoading.value = true
-            _notes.value = noteDao.getAllNotes() // if DAO returns List
-            _isLoading.value = false
+            val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(Date())
+            healthMetricDao.getTodayMetrics(todayDate).collect { list ->
+                _metricsToday.value = list
+            }
         }
     }
 
-//    fun addNote(title: String, content: String, city: String?, apiKey: String) {
-//        viewModelScope.launch {
-//            var weatherTag: String? = null
-//            if (!city.isNullOrEmpty()) {
-//                weatherRepository.getWeather(city, apiKey).collect { weather ->
-//                    weatherTag = weather
-//                }
-//            }
-//
-//            val newNote = LocalNoteEntity(
-//                title = title,
-//                content = content,
-//                timestamp = System.currentTimeMillis(),
-//                weatherTag = weatherTag
-//            )
-//            noteDao.insertNote(newNote)
-//            _notes.value = noteDao.getAllNotes()
-//        }
-//    }
-        fun addNote(title: String, content: String) {
+    fun addHealthMetric(steps: Int, heartRate: Int, sleepHours: Float) {
         viewModelScope.launch {
-            val newNote = LocalNoteEntity(
-                title = title,
-                content = content,
-                timestamp = System.currentTimeMillis(),
+            val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                .format(Date())
+
+            val newMetric = LocalHealthMetricEntity(
+                date = todayDate,
+                steps = steps,
+                heartRate = heartRate,
+                sleepHours = sleepHours
             )
-            noteDao.insertNote(newNote)
-            _notes.value = noteDao.getAllNotes()
+            healthMetricDao.insert(newMetric) // Flow will auto-update
         }
     }
-
 }
